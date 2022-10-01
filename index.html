@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8" />
+    <title>TENNIS_DOM</title>
+
+</head>
+
+<body>
+
+    <script>
+
+        'use strict';
+
+        const NUMBER_SIZE = 50; //размер шрифта счетчика очков
+        const SDVIG = 30; // сдвигсчетчика очков
+        const WIDTH_FIELD = 600; //ширина поля
+        const HEIGHT_FIELD = 300; //высота поля
+        const RADIUS_BALL = 20; //радиус мяча
+        const WIDTH_RACKET = 7;
+        const HEIGHT_RACKET = 100;
+
+        let counterL = 0;
+        let counterR = 0;
+
+        requestAnimationFrame(tick);
+
+        const konteiner = document.createElement('div'); //контейнер, в котором игра
+        konteiner.style.width = WIDTH_FIELD + 'px';
+        konteiner.style.height = (HEIGHT_FIELD + NUMBER_SIZE) + 'px';
+
+        var button = document.createElement("button");
+        button.type = 'button';
+        button.style.fontSize = NUMBER_SIZE / 2 + 'px';
+        button.innerHTML = 'старт!';
+        button.style.position = 'absolute';
+        button.style.backgroundColor = 'gray';
+        button.style.border = 'none';
+        button.onclick = start;
+        konteiner.appendChild(button);
+
+        const divNumbClock = document.createElement('div'); //контейнер для табло с очками
+        divNumbClock.style.fontSize = NUMBER_SIZE + 'px';
+        divNumbClock.style.position = 'absolute';
+        divNumbClock.style.left = (WIDTH_FIELD / 2 - SDVIG) + 'px';
+        divNumbClock.innerText = counterL + ':' + counterR;
+        konteiner.appendChild(divNumbClock);
+
+        const field = document.createElement('div'); //поле игры
+        field.style.position = 'relative';
+        field.style.backgroundColor = 'yellow';
+        field.style.width = WIDTH_FIELD + 'px';
+        field.style.height = HEIGHT_FIELD + 'px';
+        field.style.left = 0;
+        field.style.top = NUMBER_SIZE + 'px';
+        field.className = 'field';
+        konteiner.appendChild(field);
+
+        const centerX = WIDTH_FIELD / 2 - RADIUS_BALL;
+        const centerY = HEIGHT_FIELD / 2 - RADIUS_BALL;
+
+        const ball = document.createElement('div'); //мяч
+        ball.style.position = 'absolute';
+        ball.id = 'ball';
+        ball.style.width = RADIUS_BALL * 2 + 'px';
+        ball.style.height = ball.style.width;
+        ball.style.borderRadius = RADIUS_BALL + 'px';
+        ball.style.backgroundColor = 'red';
+        field.appendChild(ball);
+
+        const racketL = document.createElement('div'); //левая ракетка
+        racketL.style.position = 'absolute';
+        racketL.id = 'racket1';
+        racketL.style.width = WIDTH_RACKET + 'px';
+        racketL.style.height = HEIGHT_RACKET + 'px';
+        racketL.style.backgroundColor = 'green';
+        field.appendChild(racketL);
+
+        const racketR = document.createElement('div'); //правая ракетка
+        racketR.style.position = 'absolute';
+        racketR.id = 'racket2';
+        racketR.style.width = WIDTH_RACKET + 'px';
+        racketR.style.height = HEIGHT_RACKET + 'px';
+        racketR.style.backgroundColor = 'blue';
+        field.appendChild(racketR);
+
+        document.body.appendChild(konteiner);
+
+        function start() {
+            ballH.run();
+        }
+
+        let ballH = {
+            posX: centerX,
+            posY: centerY,
+            speedX: 0,
+            speedY: 0,
+            width: RADIUS_BALL * 2,
+            height: RADIUS_BALL * 2,
+
+            update: function () {
+                var ballObj = document.getElementById('ball');
+                ballObj.style.transform = "translateX(" + this.posX + "px) translateY(" + this.posY + "px) translateZ(0)";
+            },
+
+            run: function () {
+                do {
+                    var speedXNotNull = randomDiap(-4, 4) * 2;
+                    var speedYNotNull = randomDiap(-2, 2) * 2;
+                } while (speedXNotNull == 0 || speedYNotNull == 0);
+                this.speedX = speedXNotNull;
+                this.speedY = speedYNotNull;
+                this.posX = centerX;
+                this.posY = centerY;
+                // получение целого случайного числа в заданном диапазоне
+                function randomDiap(n, m) {
+                    return Math.floor(Math.random() * (m - n + 1)) + n;
+                }
+
+            }
+        }
+
+        let rackets = {
+            racket1PosX: 0,
+            racket1PosY: (HEIGHT_FIELD / 2 - HEIGHT_RACKET / 2),
+            racket1Speed: 0,
+            racket2PosX: (WIDTH_FIELD - WIDTH_RACKET),
+            racket2PosY: (HEIGHT_FIELD / 2 - HEIGHT_RACKET / 2),
+            racket2Speed: 0,
+            width: WIDTH_RACKET,
+            height: HEIGHT_RACKET,
+            update: function update() {
+                let racket_1Obj = racket1,
+                    racket_2Obj = racket2;
+
+                racket_1Obj.style.left = this.racket1PosX + 'px';
+                racket_1Obj.style.top = this.racket1PosY + 'px';
+                racket_2Obj.style.left = this.racket2PosX + 'px';
+                racket_2Obj.style.top = this.racket2PosY + 'px';
+            }
+        };
+
+        window.addEventListener('keydown', function (EO) {
+            EO = EO || window.event;
+
+            if (EO.keyCode === 17) {
+                rackets.racket1Speed = 12;
+            }
+            if (EO.keyCode === 16) {
+                rackets.racket1Speed = -12;
+            }
+            if (EO.keyCode === 40) {
+                rackets.racket2Speed = 12;
+            }
+            if (EO.keyCode === 38) {
+                rackets.racket2Speed = -12;
+            }
+        });
+
+        window.addEventListener('keyup', function (EO) {
+            EO = EO || window.event;
+
+            if (EO.keyCode === 17) {
+                rackets.racket1Speed = 0;
+            }
+            if (EO.keyCode === 16) {
+                rackets.racket1Speed = 0;
+            }
+            if (EO.keyCode === 40) {
+                rackets.racket2Speed = 0;
+            }
+            if (EO.keyCode === 38) {
+                rackets.racket2Speed = 0;
+            }
+
+        });
+
+        function tick() {
+
+            rackets.update();
+            ballH.update();
+
+            ballH.posX += ballH.speedX;
+            ballH.posY += ballH.speedY;
+
+
+            rackets.racket1PosY += rackets.racket1Speed;
+            rackets.racket2PosY += rackets.racket2Speed;
+
+            // ракетка выше стены?
+            if (rackets.racket1PosY <= 0) {
+                rackets.racket1PosY = 0;
+            }
+            if (rackets.racket2PosY <= 0) {
+                rackets.racket2PosY = 0;
+            }
+
+            //ракетка ниже стены?
+            if (rackets.racket1PosY + HEIGHT_RACKET > HEIGHT_FIELD) {
+                rackets.racket1PosY = HEIGHT_FIELD - HEIGHT_RACKET;
+            }
+            if (rackets.racket2PosY + HEIGHT_RACKET > HEIGHT_FIELD) {
+                rackets.racket2PosY = HEIGHT_FIELD - HEIGHT_RACKET;
+            }
+
+            // мяч правее стены?
+            if (ballH.posX + ballH.width > WIDTH_FIELD) {
+                ballH.speedX = 0;
+                ballH.speedY = 0;
+                ballH.posX = WIDTH_FIELD - ballH.width;
+                counterL++;
+                divNumbClock.innerText = counterL + ':' + counterR;
+            }
+
+            // мяч левее стены?
+            if (ballH.posX < 0) {
+                ballH.speedX = 0;
+                ballH.speedY = 0;
+                ballH.posX = 0;
+                counterR++;
+                divNumbClock.innerText = counterL + ':' + counterR;
+            }
+
+            // ударился ли мяч о левую ракетку?
+            if (ballH.posX <= rackets.racket1PosX + WIDTH_RACKET) {
+                if (ballH.posY + ballH.height >= rackets.racket1PosY && ballH.posY <= rackets.racket1PosY + HEIGHT_RACKET) {
+                    ballH.speedX = -ballH.speedX;
+                }
+            }
+
+            // ударился ли мяч о правую ракетку?
+            if (ballH.posX + ballH.width >= rackets.racket2PosX && rackets.racket2PosX <= rackets.racket2PosX + WIDTH_RACKET) {
+                if (ballH.posY >= rackets.racket2PosY && ballH.posY <= rackets.racket2PosY + HEIGHT_RACKET) {
+                    ballH.speedX = -ballH.speedX;
+                }
+            }
+
+            // мяч ниже пола?
+            if (ballH.posY + ballH.height > HEIGHT_FIELD) {
+                ballH.speedY = -ballH.speedY;
+                ballH.posY = HEIGHT_FIELD - ballH.height;
+            }
+
+            // мяч выше потолка?
+            if (ballH.posY < 0) {
+                ballH.speedY = -ballH.speedY;
+                ballH.posY = 0;
+            }
+            requestAnimationFrame(tick);
+        }
+    </script>
+</body>
+
+</html>
